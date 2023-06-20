@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ManageNetworkUsageCBC</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="network_header">Network Preferences</string>
+
+
+    <!-- Network Preferences -->
+    <string name="feed_title">Show feed only when on wifi</string>
+    <string name="attachment_title">Show new feed only when connected on wifi</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+</resources>
