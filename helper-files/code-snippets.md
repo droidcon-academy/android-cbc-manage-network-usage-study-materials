@@ -73,6 +73,7 @@ private val networkCallback = object :ConnectivityManager.NetworkCallback(){
 ## SettingsActivity.kt
 
 ```kotlin
+// inside OnSharedPreferenceChangeListener{} method
  if (key!=null && sharedPreferences!=null){
                     val setValue=sharedPreferences.getString(key, wifiNetwork)
                     val networkPreference=if (setValue!!.contains(wifiNetwork)){
