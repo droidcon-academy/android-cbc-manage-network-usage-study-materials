@@ -51,8 +51,6 @@ class NetworkListener constructor(private val connectivityManager: ConnectivityM
         connectivityManager.registerNetworkCallback(networkRequest,networkCallback)
     }
     // unregister the network callback to prevent unnecessary listening of network changes
-
-
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
         connectivityManager.unregisterNetworkCallback(networkCallback)

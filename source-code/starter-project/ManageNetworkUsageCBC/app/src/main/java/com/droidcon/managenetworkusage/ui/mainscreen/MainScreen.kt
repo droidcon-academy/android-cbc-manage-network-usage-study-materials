@@ -50,49 +50,35 @@ import com.droidcon.managenetworkusage.SettingsActivity
 @Composable
 fun MainScreen(viewModel:MainScreenViewModel){
     val context = LocalContext.current
+    // open the settings page
     val openSettingsButton = {
         val intent= Intent(context, SettingsActivity::class.java)
         context.startActivity(intent)
     }
-    val isRefreshDisplay by viewModel.refreshDisplay.collectAsState()
-    val networkPreference by viewModel.currentNetworkPreferenceSetting.collectAsState()
-    val homeScreenActions = remember {
-        HomeScreenActions(onRefreshButtonClicked =viewModel::getJokeOfTheDay,onSettingsButtonClicked =openSettingsButton)}
+    val homeScreenActions = remember { HomeScreenActions(onRefreshButtonClicked =viewModel::refresh,
+        onSettingsButtonClicked =openSettingsButton)}
+
     val mainScreenState by viewModel.mainScreenState.collectAsState()
 
-    // used when the user has not given any preference and we cannot refresh the display because the
-    // of lack of internet connectivity
-    var showNoInternetConnectivityState by remember {
-        mutableStateOf(false)
-    }
-
-    LaunchedEffect(key1 = isRefreshDisplay,networkPreference,Unit,block = {
-        if (isRefreshDisplay && (networkPreference is WiFi || networkPreference is Any)){
-            viewModel.getJokeOfTheDay()
-            showNoInternetConnectivityState=false
-        }else showNoInternetConnectivityState=true
+    LaunchedEffect(key1 = Unit, block = {
+        viewModel.getJokeOfTheDay()
     })
-
-
     Surface(modifier = Modifier.fillMaxSize()) {
-      Scaffold(modifier = Modifier.fillMaxSize(), topBar = { MainScreenAppBar(homeScreenActions = homeScreenActions) }) { paddingValues ->
-          Box(modifier = Modifier
-              .fillMaxWidth()
-              .padding(paddingValues)){
-              if (showNoInternetConnectivityState)  ErrorPage()
-              else{
-                  when(mainScreenState){
-                      is Error -> ErrorPage(networkError = (mainScreenState as Error).errorString)
-                      Loading -> CircularProgressIndicator(modifier = Modifier
-                          .size(40.dp)
-                          .align(
-                              Alignment.Center
-                          ))
-                      is MainScreenData -> FeedPage(data = mainScreenState as MainScreenData)
-                  }
-              }
-          }
-       }
+        Scaffold(modifier = Modifier.fillMaxSize(), topBar = { MainScreenAppBar(homeScreenActions = homeScreenActions) }) { paddingValues ->
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingValues)){
+                when(mainScreenState){
+                    is Error -> ErrorPage(networkError = (mainScreenState as Error).errorString)
+                    Loading -> CircularProgressIndicator(modifier = Modifier
+                        .size(40.dp)
+                        .align(
+                            Alignment.Center
+                        ))
+                    is MainScreenData -> FeedPage(data = mainScreenState as MainScreenData)
+                }
+            }
+        }
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,18 +96,9 @@ fun MainScreenAppBar(modifier: Modifier=Modifier,homeScreenActions: HomeScreenAc
         })
 }
 @Composable
-fun ErrorPage(modifier:Modifier=Modifier,networkError:String?=null){
-    val errorMessage = remember {
-        buildString {
-            appendLine("Dear User,")
-            append("We cannot sync your feed at this time because there is no network connection.")
-            appendLine()
-            append("Please check your network connection and try again. Additionally if you are on mobile network,")
-            append("go to settings and allow the app to use your mobile network to sync your feed.")
-        }
-    }
+fun ErrorPage(modifier:Modifier=Modifier,networkError:String){
     val errorMessageToBeDisplayed by remember {
-        mutableStateOf(networkError ?: errorMessage)
+        mutableStateOf(networkError)
     }
 
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
@@ -150,7 +127,7 @@ fun FeedPage(data: MainScreenData,modifier: Modifier=Modifier){
         Column(
             Modifier
                 .padding(horizontal = 4.dp, vertical = 5.dp)
-                ,
+            ,
             horizontalAlignment = Alignment.CenterHorizontally){
             Text(text = "$setUp",
                 style = MaterialTheme.typography.bodySmall,

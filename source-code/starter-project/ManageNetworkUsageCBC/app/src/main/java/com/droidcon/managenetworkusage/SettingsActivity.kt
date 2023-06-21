@@ -22,13 +22,16 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
-        private val mainScreenViewModel:MainScreenViewModel by viewModels()
+        private val mainScreenViewModel:MainScreenViewModel by viewModels({requireActivity()})
 
         private val onSharedPreferenceChangeListener =
-            OnSharedPreferenceChangeListener { _, _ ->
-                mainScreenViewModel.doRefreshDisplay(true)
-            }
+            OnSharedPreferenceChangeListener { sharedPreferences, key ->
 
+            }
+        companion object{
+            private const val anyNetwork="Any network"
+            private const val wifiNetwork="Wifi"
+        }
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
         }

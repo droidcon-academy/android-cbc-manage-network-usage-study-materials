@@ -6,13 +6,11 @@ import androidx.lifecycle.LifecycleOwner
 
 class NetworkListener constructor(private val connectivityManager: ConnectivityManager):DefaultLifecycleObserver{
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-        // to be implemented
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
-        super.onDestroy(owner)
-        // to be implemented
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
     }
 }
