@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -43,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.droidcon.managenetworkusage.SettingsActivity
 
 
@@ -51,8 +53,8 @@ import com.droidcon.managenetworkusage.SettingsActivity
 fun MainScreen(viewModel: MainScreenViewModel) {
 
     val context = LocalContext.current
-    // open the settings page
 
+    // open the settings page
     val openSettingsButton = {
         val intent = Intent(context, SettingsActivity::class.java)
         context.startActivity(intent)
@@ -70,18 +72,22 @@ fun MainScreen(viewModel: MainScreenViewModel) {
     LaunchedEffect(key1 = Unit, block = {
         viewModel.getJokeOfTheDay()
     })
-
     Surface(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = { MainScreenAppBar(homeScreenActions = homeScreenActions) }) { paddingValues ->
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
             ) {
                 when (mainScreenState) {
-                    is Error -> ErrorPage(networkError = (mainScreenState as Error).errorString)
+                    is Error -> ErrorPage(
+                        modifier = Modifier.align(Alignment.Center),
+                        networkError = (mainScreenState as Error).errorString
+                    )
+
                     Loading -> CircularProgressIndicator(
                         modifier = Modifier
                             .size(40.dp)
@@ -90,7 +96,10 @@ fun MainScreen(viewModel: MainScreenViewModel) {
                             )
                     )
 
-                    is MainScreenData -> FeedPage(data = mainScreenState as MainScreenData)
+                    is MainScreenData -> FeedPage(
+                        modifier = Modifier.align(Alignment.Center),
+                        data = mainScreenState as MainScreenData
+                    )
                 }
             }
         }
@@ -125,7 +134,7 @@ fun ErrorPage(modifier: Modifier = Modifier, networkError: String) {
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Text(
             text = errorMessageToBeDisplayed, modifier = Modifier.padding(horizontal = 10.dp),
-            textAlign = TextAlign.Justify, style = MaterialTheme.typography.bodyMedium
+            textAlign = TextAlign.Justify, style = MaterialTheme.typography.bodyLarge
         )
     }
 }
@@ -144,27 +153,31 @@ fun FeedPage(data: MainScreenData, modifier: Modifier = Modifier) {
     Card(modifier = modifier
         .clickable { expanded = !expanded }
         .fillMaxWidth()
-        .heightIn(min = 60.dp, max = 75.dp)
+        .heightIn(min = 90.dp, max = 100.dp)
         .padding(horizontal = 10.dp),
         shape = RoundedCornerShape(4.dp)
     ) {
         Column(
-            Modifier.padding(horizontal = 4.dp, vertical = 5.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp, horizontal = 5.dp),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
+                fontSize = 16.sp,
                 text = "$setUp",
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Justify,
             )
-            Spacer(Modifier.height(5.dp))
+            Spacer(Modifier.height(10.dp))
             AnimatedVisibility(visible = expanded,
                 enter = slideInVertically { -40 } + fadeIn(initialAlpha = 0.3f),
                 exit = slideOutVertically() + fadeOut()
             ) {
                 Text(
-                    text = "$punchline", style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Start
+                    text = "$punchline", style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Justify
                 )
             }
         }
