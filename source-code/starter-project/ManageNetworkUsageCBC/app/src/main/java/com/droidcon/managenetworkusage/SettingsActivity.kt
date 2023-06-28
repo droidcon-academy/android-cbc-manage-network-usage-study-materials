@@ -13,37 +13,43 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.settings_activity)
         if (savedInstanceState == null) {
             supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.settings, SettingsFragment())
-                    .commit()
+                .beginTransaction()
+                .replace(R.id.settings, SettingsFragment())
+                .commit()
         }
         supportActionBar?.setHomeButtonEnabled(true)
 
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
-        private val mainScreenViewModel:MainScreenViewModel by viewModels({requireActivity()})
+        private val mainScreenViewModel: MainScreenViewModel by viewModels({ requireActivity() })
 
         private val onSharedPreferenceChangeListener =
             OnSharedPreferenceChangeListener { sharedPreferences, key ->
 
             }
-        companion object{
-            private const val anyNetwork="Any network"
-            private const val wifiNetwork="Wifi"
+
+        companion object {
+            private const val anyNetwork = "Any network"
+            private const val wifiNetwork = "Wifi"
         }
+
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
         }
 
         override fun onResume() {
             super.onResume()
-            preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+            preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(
+                onSharedPreferenceChangeListener
+            )
         }
 
         override fun onPause() {
             super.onPause()
-            preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+            preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(
+                onSharedPreferenceChangeListener
+            )
         }
 
 

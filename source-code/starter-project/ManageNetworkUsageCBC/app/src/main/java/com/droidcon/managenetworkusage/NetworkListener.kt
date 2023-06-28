@@ -4,7 +4,8 @@ import android.net.ConnectivityManager
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 
-class NetworkListener constructor(private val connectivityManager: ConnectivityManager) : DefaultLifecycleObserver {
+class NetworkListener constructor(private val connectivityManager: ConnectivityManager) :
+    DefaultLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)

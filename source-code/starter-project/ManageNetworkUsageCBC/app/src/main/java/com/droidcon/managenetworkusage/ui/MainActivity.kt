@@ -18,13 +18,14 @@ import com.droidcon.managenetworkusage.ui.theme.ManageNetworkUsageCBCTheme
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var networkListener:NetworkListener
-    private val mainScreenViewModel:MainScreenViewModel by viewModels()
+    private lateinit var networkListener: NetworkListener
+    private val mainScreenViewModel: MainScreenViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         networkListener = NetworkListener(connectivityManager)
         lifecycle.addObserver(networkListener)
 
@@ -41,9 +42,9 @@ class MainActivity : ComponentActivity() {
         private const val wifiNetwork = "Wifi"
 
         fun SharedPreferences.getNetworkPreferenceFromSharedPreference(): NetworkPreference {
-            val userNetworkPreference=getString(syncFeedKey, wifiNetwork)
+            val userNetworkPreference = getString(syncFeedKey, wifiNetwork)
             return if (userNetworkPreference.contentEquals(wifiNetwork)) WiFiNetwork
-            else if (userNetworkPreference.contentEquals(anyNetwork) ) AnyNetwork
+            else if (userNetworkPreference.contentEquals(anyNetwork)) AnyNetwork
             else NoNetworkPreference
         }
     }
