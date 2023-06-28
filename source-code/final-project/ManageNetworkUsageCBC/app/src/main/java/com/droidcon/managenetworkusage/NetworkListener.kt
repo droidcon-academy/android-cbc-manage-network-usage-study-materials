@@ -17,39 +17,44 @@ import kotlinx.coroutines.flow.StateFlow
  * A network observer that notifies the application whenever the user's device's network connection changes
  *
  */
-class NetworkListener constructor(private val connectivityManager: ConnectivityManager):DefaultLifecycleObserver{
+class NetworkListener constructor(private val connectivityManager: ConnectivityManager) :
+    DefaultLifecycleObserver {
     private val networkRequest = NetworkRequest.Builder()
         .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
         .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
         .build()
-    private val localCurrentConnectedNetwork= MutableStateFlow<NetworkConnectionType>(NoConnection)
-    val currentConnectedNetwork:StateFlow<NetworkConnectionType>
+    private val localCurrentConnectedNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
+    val currentConnectedNetwork: StateFlow<NetworkConnectionType>
         get() = localCurrentConnectedNetwork
 
-    private val networkCallback = object :ConnectivityManager.NetworkCallback(){
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
-            localCurrentConnectedNetwork.value=if(connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)==true){
-                CellularConnection
-            }
-            else if (connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)==true){
-                WiFiConnection
-            }
-            else NoConnection
+            localCurrentConnectedNetwork.value =
+                if (connectivityManager.getNetworkCapabilities(network)
+                        ?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
+                ) {
+                    CellularConnection
+                } else if (connectivityManager.getNetworkCapabilities(network)
+                        ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+                ) {
+                    WiFiConnection
+                } else NoConnection
         }
 
         override fun onLost(network: Network) {
             super.onLost(network)
-            localCurrentConnectedNetwork.value=NoConnection
+            localCurrentConnectedNetwork.value = NoConnection
         }
     }
 
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        connectivityManager.registerNetworkCallback(networkRequest,networkCallback)
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
     }
+
     // unregister the network callback to prevent unnecessary listening of network changes
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)

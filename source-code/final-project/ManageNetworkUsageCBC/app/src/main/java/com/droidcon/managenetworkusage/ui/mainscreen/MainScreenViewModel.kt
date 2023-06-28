@@ -16,35 +16,40 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 
-class MainScreenViewModel constructor(private val jokeRepository:JokeRepository= JokeRepositoryImpl()):ViewModel() {
+class MainScreenViewModel constructor(private val jokeRepository: JokeRepository = JokeRepositoryImpl()) :
+    ViewModel() {
     private val localMainScreenState = MutableStateFlow<MainScreenState>(Loading)
-    private val localCurrentConnectedNetwork=MutableStateFlow<NetworkConnectionType>(NoConnection)
+    private val localCurrentConnectedNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
 
-    private val localCurrentNetworkPreferenceSetting=MutableStateFlow<NetworkPreference>(NoNetworkPreference)
-    private val currentNetworkPreferenceSetting:NetworkPreference
+    private val localCurrentNetworkPreferenceSetting =
+        MutableStateFlow<NetworkPreference>(NoNetworkPreference)
+    private val currentNetworkPreferenceSetting: NetworkPreference
         get() = localCurrentNetworkPreferenceSetting.value
 
-    private val currentNetworkConnectionType:NetworkConnectionType
+    private val currentNetworkConnectionType: NetworkConnectionType
         get() = localCurrentConnectedNetwork.value
 
-    val mainScreenState:StateFlow<MainScreenState>
+    val mainScreenState: StateFlow<MainScreenState>
         get() = localMainScreenState
 
 
-    fun getJokeOfTheDay(){
+    fun getJokeOfTheDay() {
         viewModelScope.launch {
-            if (currentNetworkConnectionType is WiFiConnection && currentNetworkPreferenceSetting is WiFiNetwork){
+            if (currentNetworkConnectionType is WiFiConnection && currentNetworkPreferenceSetting is WiFiNetwork) {
                 fetchJoke()
-            }else if ( (currentNetworkConnectionType is WiFiConnection || currentNetworkConnectionType is CellularConnection) && currentNetworkPreferenceSetting is AnyNetwork){
+            } else if ((currentNetworkConnectionType is WiFiConnection || currentNetworkConnectionType is CellularConnection) && currentNetworkPreferenceSetting is AnyNetwork) {
                 fetchJoke()
-            }else{
-                localMainScreenState.value=Error("Cannot sync your home feed because current's device network connection does not fulfill the app's network requirements.")
+            } else {
+                localMainScreenState.value =
+                    Error("Cannot sync your home feed because current's device network connection does not fulfill the app's network requirements.")
             }
         }
     }
-    fun refresh(){
-       getJokeOfTheDay()
+
+    fun refresh() {
+        getJokeOfTheDay()
     }
+
     private suspend fun fetchJoke() {
         jokeRepository.getJoke()
             .onStart { localMainScreenState.value = Loading }
@@ -60,19 +65,20 @@ class MainScreenViewModel constructor(private val jokeRepository:JokeRepository=
                 })
             }
     }
-    fun setCurrentNetworkConnectionType(connectionType:NetworkConnectionType){
+
+    fun setCurrentNetworkConnectionType(connectionType: NetworkConnectionType) {
         localCurrentConnectedNetwork.value = connectionType
     }
 
-    fun setCurrentUserNetworkPreference(preference:NetworkPreference){
+    fun setCurrentUserNetworkPreference(preference: NetworkPreference) {
         localCurrentNetworkPreferenceSetting.value = preference
     }
 
 
-    private fun getLastUpdatedTimeInString() =if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        }else {
-            SimpleDateFormat.getDateTimeInstance().format(Date())
-        }
+    private fun getLastUpdatedTimeInString() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    } else {
+        SimpleDateFormat.getDateTimeInstance().format(Date())
+    }
 
 }

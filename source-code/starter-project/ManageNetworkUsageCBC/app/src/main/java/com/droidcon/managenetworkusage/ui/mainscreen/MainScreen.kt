@@ -77,7 +77,8 @@ fun MainScreen(viewModel: MainScreenViewModel) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(paddingValues)
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
             ) {
                 when (mainScreenState) {
                     is Error -> ErrorPage(networkError = (mainScreenState as Error).errorString)
