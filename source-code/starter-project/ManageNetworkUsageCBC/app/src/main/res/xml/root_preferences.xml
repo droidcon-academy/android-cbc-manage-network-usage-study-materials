@@ -2,13 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
+
         app:title="Network Settings">
 
-        <ListPreference
-            app:key="syncFeed"
-            app:title="Sync Home Feed"
-            app:entries="@array/network_entries"
-            app:entryValues="@array/network_entries_values"
+        <ListPreference app:key="syncFeed" app:title="Sync Home Feed"
+            app:entries="@array/network_entries" app:entryValues="@array/network_entries_values"
             app:defaultValue="Wifi"
             app:summary="Network connectivity required to sync the home feed"
             app:useSimpleSummaryProvider="true"/>
