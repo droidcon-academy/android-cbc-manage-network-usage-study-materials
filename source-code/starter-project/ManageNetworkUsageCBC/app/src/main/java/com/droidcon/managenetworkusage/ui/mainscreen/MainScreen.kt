@@ -144,7 +144,7 @@ fun FeedPage(data: MainScreenData, modifier: Modifier = Modifier) {
     Card(modifier = modifier
         .clickable { expanded = !expanded }
         .fillMaxWidth()
-        .heightIn(min = 60.dp, max = 75.dp)
+        .heightIn(min = 75.dp, max = 80.dp)
         .padding(horizontal = 10.dp),
         shape = RoundedCornerShape(4.dp)
     ) {
@@ -155,7 +155,7 @@ fun FeedPage(data: MainScreenData, modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = "$setUp",
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(5.dp))
@@ -164,7 +164,7 @@ fun FeedPage(data: MainScreenData, modifier: Modifier = Modifier) {
                 exit = slideOutVertically() + fadeOut()
             ) {
                 Text(
-                    text = "$punchline", style = MaterialTheme.typography.bodySmall,
+                    text = "$punchline", style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Start
                 )
             }
