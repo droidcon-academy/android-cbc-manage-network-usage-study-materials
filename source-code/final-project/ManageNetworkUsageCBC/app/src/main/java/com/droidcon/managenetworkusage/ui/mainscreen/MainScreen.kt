@@ -48,13 +48,16 @@ import com.droidcon.managenetworkusage.SettingsActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel:MainScreenViewModel){
+fun MainScreen(viewModel: MainScreenViewModel) {
+
     val context = LocalContext.current
     // open the settings page
+
     val openSettingsButton = {
         val intent= Intent(context, SettingsActivity::class.java)
         context.startActivity(intent)
     }
+
     val homeScreenActions = remember { HomeScreenActions(onRefreshButtonClicked =viewModel::refresh,
         onSettingsButtonClicked =openSettingsButton)}
 
@@ -63,6 +66,7 @@ fun MainScreen(viewModel:MainScreenViewModel){
     LaunchedEffect(key1 = Unit, block = {
         viewModel.getJokeOfTheDay()
     })
+
     Surface(modifier = Modifier.fillMaxSize()) {
       Scaffold(modifier = Modifier.fillMaxSize(), topBar = { MainScreenAppBar(homeScreenActions = homeScreenActions) }) { paddingValues ->
           Box(modifier = Modifier
@@ -81,9 +85,10 @@ fun MainScreen(viewModel:MainScreenViewModel){
        }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreenAppBar(modifier: Modifier=Modifier,homeScreenActions: HomeScreenActions){
+fun MainScreenAppBar(modifier: Modifier = Modifier, homeScreenActions: HomeScreenActions){
     TopAppBar(modifier = modifier,
         title = { Text(text = "Managy")}, actions = {
             Icon(imageVector = Icons.Filled.Refresh,
@@ -96,7 +101,7 @@ fun MainScreenAppBar(modifier: Modifier=Modifier,homeScreenActions: HomeScreenAc
         })
 }
 @Composable
-fun ErrorPage(modifier:Modifier=Modifier,networkError:String){
+fun ErrorPage(modifier:Modifier = Modifier, networkError:String){
     val errorMessageToBeDisplayed by remember {
         mutableStateOf(networkError)
     }
@@ -107,7 +112,7 @@ fun ErrorPage(modifier:Modifier=Modifier,networkError:String){
     }
 }
 @Composable
-fun FeedPage(data: MainScreenData,modifier: Modifier=Modifier){
+fun FeedPage(data: MainScreenData,modifier: Modifier=Modifier) {
     val setUp by remember {
         mutableStateOf(data.joke?.setup)
     }
@@ -123,11 +128,9 @@ fun FeedPage(data: MainScreenData,modifier: Modifier=Modifier){
         .heightIn(min = 60.dp, max = 75.dp)
         .padding(horizontal = 10.dp),
         shape = RoundedCornerShape(4.dp)
-    ){
+    ) {
         Column(
-            Modifier
-                .padding(horizontal = 4.dp, vertical = 5.dp)
-                ,
+            Modifier.padding(horizontal = 4.dp, vertical = 5.dp),
             horizontalAlignment = Alignment.CenterHorizontally){
             Text(text = "$setUp",
                 style = MaterialTheme.typography.bodySmall,
@@ -142,9 +145,10 @@ fun FeedPage(data: MainScreenData,modifier: Modifier=Modifier){
         }
     }
 }
+
 @Composable
 @Preview(showSystemUi = true, showBackground = true)
-fun FeedPagePreview(){
+fun FeedPagePreview() {
     var expanded by remember{mutableStateOf(false)}
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
         Card(modifier = Modifier
@@ -152,7 +156,7 @@ fun FeedPagePreview(){
             .heightIn(min = 60.dp, max = 70.dp)
             .padding(horizontal = 10.dp),
             shape = RoundedCornerShape(4.dp)
-        ){
+        ) {
             Column(
                 Modifier
                     .padding(horizontal = 4.dp, vertical = 5.dp)

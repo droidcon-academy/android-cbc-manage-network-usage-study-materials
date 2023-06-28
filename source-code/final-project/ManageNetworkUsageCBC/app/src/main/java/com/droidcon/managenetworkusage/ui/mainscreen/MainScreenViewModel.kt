@@ -20,7 +20,6 @@ class MainScreenViewModel constructor(private val jokeRepository:JokeRepository=
     private val localMainScreenState = MutableStateFlow<MainScreenState>(Loading)
     private val localCurrentConnectedNetwork=MutableStateFlow<NetworkConnectionType>(NoConnection)
 
-
     private val localCurrentNetworkPreferenceSetting=MutableStateFlow<NetworkPreference>(NoNetworkPreference)
     private val currentNetworkPreferenceSetting:NetworkPreference
         get() = localCurrentNetworkPreferenceSetting.value
