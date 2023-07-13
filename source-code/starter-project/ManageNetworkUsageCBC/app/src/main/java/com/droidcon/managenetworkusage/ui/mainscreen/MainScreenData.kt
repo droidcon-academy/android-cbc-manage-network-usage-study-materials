@@ -12,14 +12,3 @@ data class MainScreenData(
 
 @JvmInline
 value class Error(val errorString: String) : MainScreenState
-
-sealed interface NetworkPreference
-object WiFiNetwork : NetworkPreference
-object AnyNetwork : NetworkPreference
-object NoNetworkPreference : NetworkPreference
-
-
-sealed interface NetworkConnectionType
-object WiFiConnection : NetworkConnectionType
-object CellularConnection : NetworkConnectionType
-object NoConnection : NetworkConnectionType

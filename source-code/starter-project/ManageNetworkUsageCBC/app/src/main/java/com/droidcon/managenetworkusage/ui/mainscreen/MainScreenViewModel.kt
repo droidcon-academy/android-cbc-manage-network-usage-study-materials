@@ -20,23 +20,14 @@ class MainScreenViewModel constructor(private val jokeRepository: JokeRepository
     ViewModel() {
 
     private val localMainScreenState = MutableStateFlow<MainScreenState>(Loading)
-    private val localCurrentConnectedNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
 
-
-    private val localCurrentNetworkPreferenceSetting =
-        MutableStateFlow<NetworkPreference>(NoNetworkPreference)
-    private val currentNetworkPreferenceSetting: NetworkPreference
-        get() = localCurrentNetworkPreferenceSetting.value
-
-    private val currentNetworkConnectionType: NetworkConnectionType
-        get() = localCurrentConnectedNetwork.value
 
     val mainScreenState: StateFlow<MainScreenState>
         get() = localMainScreenState
 
     fun getJokeOfTheDay() {
         viewModelScope.launch {
-            fetchJoke()
+           fetchJoke()
         }
     }
 
@@ -60,13 +51,7 @@ class MainScreenViewModel constructor(private val jokeRepository: JokeRepository
             }
     }
 
-    fun setCurrentUserNetworkPreference(preference: NetworkPreference) {
-        localCurrentNetworkPreferenceSetting.value = preference
-    }
 
-    fun setCurrentNetworkConnectionType(connectionType: NetworkConnectionType) {
-        localCurrentConnectedNetwork.value = connectionType
-    }
 
 
     private fun getLastUpdatedTimeInString() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -1,6 +1,5 @@
 package com.droidcon.managenetworkusage.ui.mainscreen
 
-import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -45,7 +44,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.droidcon.managenetworkusage.SettingsActivity
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,15 +53,15 @@ fun MainScreen(viewModel: MainScreenViewModel) {
     val context = LocalContext.current
 
     // open the settings page
-    val openSettingsButton = {
-        val intent = Intent(context, SettingsActivity::class.java)
-        context.startActivity(intent)
-    }
+//    val openSettingsButton = {
+//        val intent = Intent(context, SettingsActivity::class.java)
+//        context.startActivity(intent)
+//    }
 
     val homeScreenActions = remember {
         HomeScreenActions(
             onRefreshButtonClicked = viewModel::refresh,
-            onSettingsButtonClicked = openSettingsButton
+            onSettingsButtonClicked = {}
         )
     }
 
