@@ -50,33 +50,8 @@ private val networkRequest = NetworkRequest.Builder()
     .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
     .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
     .build()
+
 // network callback
-
-private val networkCallback = object : ConnectivityManager.NetworkCallback() {
-    override fun onAvailable(network: Network) {
-        super.onAvailable(network)
-        localCurrentConnectedNetwork.value =
-            if (connectivityManager.getNetworkCapabilities(network)
-                    ?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
-            ) {
-                CellularConnection
-            } else if (connectivityManager.getNetworkCapabilities(network)
-                    ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-            ) {
-                WiFiConnection
-            } else if (connectivityManager.getNetworkCapabilities(network)
-                    ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
-            ) {
-                VpnConnection
-            } else NoConnection
-    }
-
-    override fun onLost(network: Network) {
-        super.onLost(network)
-        localCurrentConnectedNetwork.value = NoConnection
-    }
-}
-
     private val networkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
