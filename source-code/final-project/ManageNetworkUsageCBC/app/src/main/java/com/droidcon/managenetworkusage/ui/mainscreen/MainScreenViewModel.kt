@@ -23,11 +23,7 @@ class MainScreenViewModel constructor(private val jokeRepository: JokeRepository
 
     private val localCurrentNetworkPreferenceSetting =
         MutableStateFlow<NetworkPreference>(NoNetworkPreference)
-    private val currentNetworkPreferenceSetting: NetworkPreference
-        get() = localCurrentNetworkPreferenceSetting.value
 
-    private val currentNetworkConnectionType: NetworkConnectionType
-        get() = localCurrentConnectedNetwork.value
 
     val mainScreenState: StateFlow<MainScreenState>
         get() = localMainScreenState
@@ -35,13 +31,12 @@ class MainScreenViewModel constructor(private val jokeRepository: JokeRepository
 
     fun getJokeOfTheDay() {
         viewModelScope.launch {
-            if (currentNetworkConnectionType is WiFiConnection
-                && currentNetworkPreferenceSetting is WiFiNetwork) {
+            if (localCurrentConnectedNetwork.value is WiFiConnection
+                && localCurrentNetworkPreferenceSetting.value is WiFiNetwork) {
                 fetchJoke()
-            } else if ((currentNetworkConnectionType is WiFiConnection
-                        || currentNetworkConnectionType is CellularConnection
-                        || currentNetworkConnectionType is VpnConnection)
-                && currentNetworkPreferenceSetting is AnyNetwork) {
+            } else if ((localCurrentConnectedNetwork.value is WiFiConnection
+                        || localCurrentConnectedNetwork.value is CellularConnection)
+                && localCurrentNetworkPreferenceSetting.value is AnyNetwork) {
                 fetchJoke()
             } else {
                 localMainScreenState.value =

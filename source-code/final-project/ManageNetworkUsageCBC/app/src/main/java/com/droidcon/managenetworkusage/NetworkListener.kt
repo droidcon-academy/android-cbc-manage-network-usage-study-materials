@@ -9,7 +9,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.droidcon.managenetworkusage.ui.mainscreen.CellularConnection
 import com.droidcon.managenetworkusage.ui.mainscreen.NetworkConnectionType
 import com.droidcon.managenetworkusage.ui.mainscreen.NoConnection
-import com.droidcon.managenetworkusage.ui.mainscreen.VpnConnection
 import com.droidcon.managenetworkusage.ui.mainscreen.WiFiConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,9 +41,6 @@ class NetworkListener constructor(private val connectivityManager: ConnectivityM
                         ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
                 ) {
                     WiFiConnection
-                } else if(connectivityManager.getNetworkCapabilities(network)
-                    ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN)==true) {
-                    VpnConnection
                 }else NoConnection
         }
 

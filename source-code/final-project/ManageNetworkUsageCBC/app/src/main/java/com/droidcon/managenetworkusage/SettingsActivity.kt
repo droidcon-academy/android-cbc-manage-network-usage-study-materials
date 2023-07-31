@@ -29,15 +29,14 @@ class SettingsActivity : AppCompatActivity() {
 
         private val onSharedPreferenceChangeListener =
             OnSharedPreferenceChangeListener { sharedPreferences, key ->
-
-                if (key != null && sharedPreferences != null) {
-                    val setValue = sharedPreferences.getString(key, wifiNetwork)
-                    val networkPreference = if (setValue!!.contains(wifiNetwork)) {
+                val setUserNetworkPreference =sharedPreferences.getString(key, wifiNetwork)
+                if (setUserNetworkPreference != null) {
+                    val setNetworkPreference = if (setUserNetworkPreference.contains(wifiNetwork)) {
                         WiFiNetwork
-                    } else if (setValue.contains(anyNetwork)) {
+                    }else if (setUserNetworkPreference.contains(anyNetwork)){
                         AnyNetwork
-                    } else NoNetworkPreference
-                    mainScreenViewModel.setCurrentUserNetworkPreference(networkPreference)
+                    }else NoNetworkPreference
+                    mainScreenViewModel.setCurrentUserNetworkPreference(setNetworkPreference)
                 }
             }
 

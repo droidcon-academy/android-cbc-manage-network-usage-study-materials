@@ -22,4 +22,3 @@ sealed interface NetworkConnectionType
 object WiFiConnection : NetworkConnectionType
 object CellularConnection : NetworkConnectionType
 object NoConnection : NetworkConnectionType
-object VpnConnection: NetworkConnectionType
