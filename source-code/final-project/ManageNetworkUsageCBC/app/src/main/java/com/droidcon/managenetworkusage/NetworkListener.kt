@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.droidcon.managenetworkusage.ui.mainscreen.CellularConnection
 import com.droidcon.managenetworkusage.ui.mainscreen.NetworkConnectionType
 import com.droidcon.managenetworkusage.ui.mainscreen.NoConnection
+import com.droidcon.managenetworkusage.ui.mainscreen.VpnConnection
 import com.droidcon.managenetworkusage.ui.mainscreen.WiFiConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,7 @@ class NetworkListener constructor(private val connectivityManager: ConnectivityM
     private val networkRequest = NetworkRequest.Builder()
         .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+        .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
         .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
         .build()
     private val localCurrentConnectedNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
@@ -40,7 +42,10 @@ class NetworkListener constructor(private val connectivityManager: ConnectivityM
                         ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
                 ) {
                     WiFiConnection
-                } else NoConnection
+                } else if(connectivityManager.getNetworkCapabilities(network)
+                    ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN)==true) {
+                    VpnConnection
+                }else NoConnection
         }
 
         override fun onLost(network: Network) {

@@ -1,0 +1,10 @@
+<resources>
+    <string-array name="network_entries">
+        <item>Download on Wifi</item>
+        <item>Download on Any Network</item>
+    </string-array>
+    <string-array name="network_entries_values">
+        <item>Wifi</item>
+        <item>Any network</item>
+    </string-array>
+</resources>
