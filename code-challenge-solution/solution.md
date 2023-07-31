@@ -8,12 +8,12 @@ working with wifi and cellullar connections.
 
 ```kotlin
 
-    fun getJokeOfTheDay() {
+fun getJokeOfTheDay() {
         viewModelScope.launch {
             if (localCurrentUserNetworkPreference.value is AnyNetwork
                 && (localCurrentDeviceNetwork.value is WiFiConnection
                         || localCurrentDeviceNetwork.value is CellularConnection
-             || localCurrentDeviceNetwork.value is VPNConnection)
+                        || localCurrentDeviceNetwork.value is VPNConnection)
             ) {
                 fetchJoke()
             } else if (localCurrentDeviceNetwork.value is WiFiConnection &&
@@ -44,13 +44,13 @@ object VPNConnection:NetworkConnectionType
 
 ```kotlin
 // network request
-private val networkRequest = NetworkRequest.Builder()
-    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-    .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-    .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-    .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
-    .build()
-
+ private val networkRequest = NetworkRequest
+        .Builder()
+        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+        .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
+        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+        .build()
 // network callback
     private val networkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -68,12 +68,10 @@ private val networkRequest = NetworkRequest.Builder()
                         ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
                 ) {
                     WiFiConnection
-                }else if (connectivityManager
-                        .getNetworkCapabilities(network)
-                        ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
-                ){ 
-                  VPNConnection
-                 }else NoConnection
+                }else if(connectivityManager.getNetworkCapabilities(network)
+                        ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN)==true)
+                    VPNConnection
+                else NoConnection
         }
 
         override fun onLost(network: Network) {

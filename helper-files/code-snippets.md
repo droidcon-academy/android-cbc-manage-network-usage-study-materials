@@ -6,8 +6,9 @@
  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 // inside the settings activity node in the manifest file
 
-<activity android:name=".SettingsActivity"
+ <activity android:name=".SettingsActivity"
             android:exported="false"
+            android:theme="@style/Theme.ManageNetworkUsageCBC.SettingsTheme"
             android:label="@string/title_activity_settings">
             <intent-filter>
                 <action android:name="android.intent.action.MANAGE_NETWORK_USAGE"/>
