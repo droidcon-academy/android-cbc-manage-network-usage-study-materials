@@ -21,24 +21,25 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
     private lateinit var networkListener: NetworkListener
     private val mainScreenViewModel: MainScreenViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val connectivityManager =
             getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         networkListener = NetworkListener(connectivityManager)
         lifecycle.addObserver(networkListener)
 
         lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
-                networkListener.currentConnectedNetwork.collectLatest { connectionType ->
-                    // get and set the device's current network connection
-                    mainScreenViewModel.setCurrentNetworkConnectionType(connectionType)
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                networkListener.currentDeviceNetwork.collectLatest { currentNetwork ->
+                    mainScreenViewModel.setCurrentDeviceNetwork(currentNetwork)
                 }
             }
         }
-
         setContent {
             ManageNetworkUsageCBCTheme {
                 MainScreen(viewModel = mainScreenViewModel)
@@ -46,25 +47,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        val defaultApplicationSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val currentUserNetwork = defaultApplicationSharedPrefs.getString(syncFeedKey, wifiNetwork)
-
-        currentUserNetwork?.let { setNetwork ->
-            val networkPreference = if (setNetwork.contentEquals(wifiNetwork)) WiFiNetwork
-            else if (setNetwork.contentEquals(anyNetwork)) AnyNetwork
-            else NoNetworkPreference
-            mainScreenViewModel.setCurrentUserNetworkPreference(networkPreference)
-        }
-    }
-
-
     companion object {
         private const val syncFeedKey = "syncFeed"
         private const val anyNetwork = "Any network"
         private const val wifiNetwork = "Wifi"
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val defaultSharedPreference = PreferenceManager.getDefaultSharedPreferences(this)
+        val currentUserNetwork = defaultSharedPreference.getString(syncFeedKey, wifiNetwork)
+        currentUserNetwork?.let { setNetwork ->
+            val networkPreference = if (setNetwork.contains(anyNetwork)) AnyNetwork
+            else if (setNetwork.contains(wifiNetwork)) WiFiNetwork
+            else NoNetworkPreference
+            mainScreenViewModel.setCurrentUserNetworkPreference(networkPreference)
+        }
     }
 
     override fun onDestroy() {

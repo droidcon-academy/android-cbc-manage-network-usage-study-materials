@@ -20,28 +20,29 @@ class SettingsActivity : AppCompatActivity() {
                 .replace(R.id.settings, SettingsFragment())
                 .commit()
         }
-        supportActionBar?.setHomeButtonEnabled(true)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
         private val mainScreenViewModel: MainScreenViewModel by viewModels({ requireActivity() })
-
         private val onSharedPreferenceChangeListener =
             OnSharedPreferenceChangeListener { sharedPreferences, key ->
-                val setUserNetworkPreference =sharedPreferences.getString(key, wifiNetwork)
+                val setUserNetworkPreference = sharedPreferences
+                    .getString(key, wifiNetwork)
                 if (setUserNetworkPreference != null) {
                     val setNetworkPreference = if (setUserNetworkPreference.contains(wifiNetwork)) {
                         WiFiNetwork
-                    }else if (setUserNetworkPreference.contains(anyNetwork)){
+                    } else if (setUserNetworkPreference.contains(anyNetwork)) {
                         AnyNetwork
-                    }else NoNetworkPreference
+                    } else NoNetworkPreference
                     mainScreenViewModel.setCurrentUserNetworkPreference(setNetworkPreference)
                 }
+
             }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+
         }
 
         companion object {
@@ -49,20 +50,17 @@ class SettingsActivity : AppCompatActivity() {
             private const val wifiNetwork = "Wifi"
         }
 
-        override fun onResume() {
-            super.onResume()
-            preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(
-                onSharedPreferenceChangeListener
-            )
-        }
-
         override fun onPause() {
             super.onPause()
-            preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(
-                onSharedPreferenceChangeListener
-            )
+            preferenceScreen.sharedPreferences
+                ?.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
         }
 
+        override fun onResume() {
+            super.onResume()
+            preferenceScreen.sharedPreferences
+                ?.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+        }
 
     }
 }
