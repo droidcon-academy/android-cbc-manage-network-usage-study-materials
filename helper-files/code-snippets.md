@@ -4,6 +4,17 @@
 
 ```
  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+// inside the settings activity node in the manifest file
+<activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ManageNetworkUsageCBC.SettingsTheme"
+            android:label="@string/title_activity_settings">
+            <intent-filter>
+                <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
 ```
 
@@ -57,6 +68,22 @@ private val networkCallback = object :ConnectivityManager.NetworkCallback(){
 ## MainScreenViewModel.kt
 
 ```kotlin
+
+  private val localCurrentConnectedNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
+
+  private val localCurrentNetworkPreferenceSetting =
+        MutableStateFlow<NetworkPreference>(NoNetworkPreference)
+
+
+  fun setCurrentNetworkConnectionType(connectionType: NetworkConnectionType) {
+        localCurrentConnectedNetwork.value = connectionType
+    }
+
+
+   fun setCurrentUserNetworkPreference(preference: NetworkPreference) {
+        localCurrentNetworkPreferenceSetting.value = preference
+ }
+
  fun getJokeOfTheDay(){
         viewModelScope.launch {
             if (currentNetworkConnectionType is WiFiConnection && currentNetworkPreferenceSetting is WiFiNetwork){
@@ -73,16 +100,33 @@ private val networkCallback = object :ConnectivityManager.NetworkCallback(){
 ## SettingsActivity.kt
 
 ```kotlin
+// on resume method of the SettingsFragment
+ override fun onResume() {
+            super.onResume()
+            preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(
+                onSharedPreferenceChangeListener
+            )
+        }
+
+// on pause method of the SettingsFragment
+override fun onPause() {
+            super.onPause()
+            preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(
+                onSharedPreferenceChangeListener
+            )
+  }
+
+
 // inside OnSharedPreferenceChangeListener{} method
- if (key!=null && sharedPreferences!=null){
-                    val setValue=sharedPreferences.getString(key, wifiNetwork)
-                    val networkPreference=if (setValue!!.contains(wifiNetwork)){
+  val setUserNetworkPreference =sharedPreferences.getString(key, wifiNetwork)
+                if (setUserNetworkPreference != null) {
+                    val setNetworkPreference = if (setUserNetworkPreference.contains(wifiNetwork)) {
                         WiFiNetwork
-                    }else if (setValue.contains(anyNetwork)){
+                    }else if (setUserNetworkPreference.contains(anyNetwork)){
                         AnyNetwork
                     }else NoNetworkPreference
-                    mainScreenViewModel.setCurrentUserNetworkPreference(networkPreference)
-                }
+                    mainScreenViewModel.setCurrentUserNetworkPreference(setNetworkPreference)
+     }
 ```
 ## MainActivity.kt
 
@@ -98,8 +142,17 @@ lifecycleScope.launch {
         }
 
 // inside the activity's onStart method
-  val defaultApplicationSharedPrefs= PreferenceManager.getDefaultSharedPreferences(this)
-        val currentNetworkPreference=defaultApplicationSharedPrefs.getNetworkPreferenceFromSharedPreference()
-        mainScreenViewModel.setCurrentUserNetworkPreference(currentNetworkPreference)
+    override fun onStart() {
+        super.onStart()
+        val defaultApplicationSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val currentUserNetwork = defaultApplicationSharedPrefs.getString(syncFeedKey, wifiNetwork)
+
+        currentUserNetwork?.let { setNetwork ->
+            val networkPreference = if (setNetwork.contentEquals(wifiNetwork)) WiFiNetwork
+            else if (setNetwork.contentEquals(anyNetwork)) AnyNetwork
+            else NoNetworkPreference
+            mainScreenViewModel.setCurrentUserNetworkPreference(networkPreference)
+        }
+    }
 
 ```
