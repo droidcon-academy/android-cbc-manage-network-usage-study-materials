@@ -8,21 +8,26 @@ working with wifi and cellullar connections.
 
 ```kotlin
 
-  fun getJokeOfTheDay(){
-      viewModelScope.launch {
-          if (localCurrentConnectedNetwork.value is WiFiConnection
-              && localCurrentNetworkPreferenceSetting.value is WiFiNetwork) {
-              fetchJoke()
-          } else if ((localCurrentConnectedNetwork.value is WiFiConnection
-                      || localCurrentConnectedNetwork.value is CellularConnection
-                      || localCurrentConnectedNetwork.value is VpnConnection)
-              && localCurrentNetworkPreferenceSetting.value is AnyNetwork) {
-              fetchJoke()
-          } else {
-              localMainScreenState.value =
-                  Error("Cannot sync your home feed because current's device network connection does not fulfill the app's network requirements.")
-          }
-      }
+    fun getJokeOfTheDay() {
+        viewModelScope.launch {
+            if (localCurrentUserNetworkPreference.value is AnyNetwork
+                && (localCurrentDeviceNetwork.value is WiFiConnection
+                        || localCurrentDeviceNetwork.value is CellularConnection
+             || localCurrentDeviceNetwork.value is VPNConnection)
+            ) {
+                fetchJoke()
+            } else if (localCurrentDeviceNetwork.value is WiFiConnection &&
+                localCurrentUserNetworkPreference.value is WiFiNetwork
+            ) {
+                fetchJoke()
+            } else {
+                localMainScreenState.value = Error(
+                    "The application cannot fetch the joke from the api because" +
+                            "the network requirements are not fulfilled"
+                )
+            }
+
+        }
     }
 ```
 
@@ -71,5 +76,35 @@ private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         localCurrentConnectedNetwork.value = NoConnection
     }
 }
+
+    private val networkCallback = object : NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            super.onAvailable(network)
+            localCurrentDeviceNetwork.value =
+                if (connectivityManager.getNetworkCapabilities(network)
+                        ?.hasTransport(
+                            NetworkCapabilities
+                                .TRANSPORT_CELLULAR
+                        ) == true
+                ) {
+                    CellularConnection
+                } else if (connectivityManager
+                        .getNetworkCapabilities(network)
+                        ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+                ) {
+                    WiFiConnection
+                }else if (connectivityManager
+                        .getNetworkCapabilities(network)
+                        ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
+                ){ 
+                  VPNConnection
+                 }else NoConnection
+        }
+
+        override fun onLost(network: Network) {
+            super.onLost(network)
+            localCurrentDeviceNetwork.value = NoConnection
+        }
+    }
 
 ```
