@@ -27,28 +27,31 @@ private val networkRequest = NetworkRequest.Builder()
         .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
         .build()
 
-// device's current connection type
-private val localCurrentConnectedNetwork= MutableStateFlow<NetworkConnectionType>(NoConnection)
-
-val currentConnectedNetwork:StateFlow<NetworkConnectionType> 
-   get() = localCurrentConnectedNetwork
-
-// network callback
-private val networkCallback = object :ConnectivityManager.NetworkCallback(){
+   private val localCurrentDeviceNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
+    val currentDeviceNetwork: StateFlow<NetworkConnectionType>
+        get() = localCurrentDeviceNetwork
+    private val networkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
-            localCurrentConnectedNetwork.value=if(connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)==true){
-                CellularConnection
-            }
-            else if (connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)==true){
-                WiFiConnection
-            }
-            else NoConnection
+            localCurrentDeviceNetwork.value =
+                if (connectivityManager.getNetworkCapabilities(network)
+                        ?.hasTransport(
+                            NetworkCapabilities
+                                .TRANSPORT_CELLULAR
+                        ) == true
+                ) {
+                    CellularConnection
+                } else if (connectivityManager
+                        .getNetworkCapabilities(network)
+                        ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+                ) {
+                    WiFiConnection
+                } else NoConnection
         }
 
         override fun onLost(network: Network) {
             super.onLost(network)
-            localCurrentConnectedNetwork.value=NoConnection
+            localCurrentDeviceNetwork.value = NoConnection
         }
     }
   // lifecycle owner's onStart method 
@@ -68,31 +71,36 @@ private val networkCallback = object :ConnectivityManager.NetworkCallback(){
 
 ```kotlin
 
-    private val localCurrentDeviceNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
+     private val localCurrentDeviceNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
 
-    private val localCurrentUserNetworkPreference = MutableStateFlow<NetworkPreference>(NoNetworkPreference)
-    
-    fun setCurrentUserNetworkPreference(newNetworkPreference: NetworkPreference){
+    private val localCurrentUserNetworkPreference =
+        MutableStateFlow<NetworkPreference>(NoNetworkPreference)
+
+    fun setCurrentUserNetworkPreference(newNetworkPreference: NetworkPreference) {
         localCurrentUserNetworkPreference.value = newNetworkPreference
     }
 
-    fun setCurrentDeviceNetwork(newDeviceNetwork:NetworkConnectionType){
+    fun setCurrentDeviceNetwork(newDeviceNetwork: NetworkConnectionType) {
         localCurrentDeviceNetwork.value = newDeviceNetwork
     }
 
-    fun getJokeOfTheDay() {
+   fun getJokeOfTheDay() {
         viewModelScope.launch {
-           if (localCurrentUserNetworkPreference.value is AnyNetwork
-               && (localCurrentDeviceNetwork.value is WiFiConnection
-                       || localCurrentDeviceNetwork.value is CellularConnection)){
-               fetchJoke()
-           }else if (localCurrentDeviceNetwork.value is WiFiConnection &&
-               localCurrentUserNetworkPreference.value is WiFiNetwork){
-               fetchJoke()
-           }else {
-               localMainScreenState.value = Error("The application cannot fetch the joke from the api because" +
-                       "the network requirements are not fulfilled")
-           }
+            if (localCurrentUserNetworkPreference.value is AnyNetwork
+                && (localCurrentDeviceNetwork.value is WiFiConnection
+                        || localCurrentDeviceNetwork.value is CellularConnection)
+            ) {
+                fetchJoke()
+            } else if (localCurrentDeviceNetwork.value is WiFiConnection &&
+                localCurrentUserNetworkPreference.value is WiFiNetwork
+            ) {
+                fetchJoke()
+            } else {
+                localMainScreenState.value = Error(
+                    "The application cannot fetch the joke from the api because" +
+                            "the network requirements are not fulfilled"
+                )
+            }
 
         }
     }
@@ -101,24 +109,25 @@ private val networkCallback = object :ConnectivityManager.NetworkCallback(){
 ## SettingsFragment.kt
 
 ```kotlin
- private val mainScreenViewModel:MainScreenViewModel by viewModels({requireActivity()})
+  private val mainScreenViewModel: MainScreenViewModel by viewModels({ requireActivity() })
 
 // inside OnSharedPreferenceChangeListener{} method
  private val onSharedPreferenceChangeListener =
             OnSharedPreferenceChangeListener { sharedPreferences, key ->
                 val setUserNetworkPreference = sharedPreferences
                     .getString(key, wifiNetwork)
-                if (setUserNetworkPreference!=null){
-                    val setNetworkPreference=  if (setUserNetworkPreference.contains(wifiNetwork)){
-                      WiFiNetwork
-                    }else if (setUserNetworkPreference.contains(anyNetwork)){
+                if (setUserNetworkPreference != null) {
+                    val setNetworkPreference = if (setUserNetworkPreference.contains(wifiNetwork)) {
+                        WiFiNetwork
+                    } else if (setUserNetworkPreference.contains(anyNetwork)) {
                         AnyNetwork
-                    }else NoNetworkPreference
+                    } else NoNetworkPreference
                     mainScreenViewModel.setCurrentUserNetworkPreference(setNetworkPreference)
                 }
 
             }
-  override fun onPause() {
+
+override fun onPause() {
             super.onPause()
             preferenceScreen.sharedPreferences
                 ?.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
@@ -129,7 +138,6 @@ private val networkCallback = object :ConnectivityManager.NetworkCallback(){
             preferenceScreen.sharedPreferences
                 ?.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
         }
-
 
 ```
 ## MainActivity.kt
