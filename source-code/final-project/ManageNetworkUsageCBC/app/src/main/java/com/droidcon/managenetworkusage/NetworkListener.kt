@@ -41,7 +41,7 @@ class NetworkListener constructor(private val connectivityManager: ConnectivityM
                         ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
                 ) {
                     WiFiConnection
-                }else NoConnection
+                } else NoConnection
         }
 
         override fun onLost(network: Network) {

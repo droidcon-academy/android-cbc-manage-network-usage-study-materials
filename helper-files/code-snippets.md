@@ -23,35 +23,36 @@
 ```kotlin
 // networkRequest
 private val networkRequest = NetworkRequest.Builder()
-        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-        .build()
+    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+    .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
+    .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+    .build()
 
-// device's current connection type
-private val localCurrentConnectedNetwork= MutableStateFlow<NetworkConnectionType>(NoConnection)
+private val localCurrentConnectedNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
+val currentConnectedNetwork: StateFlow<NetworkConnectionType>
+    get() = localCurrentConnectedNetwork
 
-val currentConnectedNetwork:StateFlow<NetworkConnectionType> 
-   get() = localCurrentConnectedNetwork
-
-// network callback
-private val networkCallback = object :ConnectivityManager.NetworkCallback(){
-        override fun onAvailable(network: Network) {
-            super.onAvailable(network)
-            localCurrentConnectedNetwork.value=if(connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)==true){
+private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+    override fun onAvailable(network: Network) {
+        super.onAvailable(network)
+        localCurrentConnectedNetwork.value =
+            if (connectivityManager.getNetworkCapabilities(network)
+                    ?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
+            ) {
                 CellularConnection
-            }
-            else if (connectivityManager.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)==true){
+            } else if (connectivityManager.getNetworkCapabilities(network)
+                    ?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+            ) {
                 WiFiConnection
-            }
-            else NoConnection
-        }
-
-        override fun onLost(network: Network) {
-            super.onLost(network)
-            localCurrentConnectedNetwork.value=NoConnection
-        }
+            } else NoConnection
     }
+
+    override fun onLost(network: Network) {
+        super.onLost(network)
+        localCurrentConnectedNetwork.value = NoConnection
+    }
+}
   // lifecycle owner's onStart method 
   override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
@@ -85,15 +86,19 @@ private val networkCallback = object :ConnectivityManager.NetworkCallback(){
  }
 
  fun getJokeOfTheDay(){
-        viewModelScope.launch {
-            if (currentNetworkConnectionType is WiFiConnection && currentNetworkPreferenceSetting is WiFiNetwork){
-                fetchJoke()
-            }else if ( (currentNetworkConnectionType is WiFiConnection || currentNetworkConnectionType is CellularConnection) && currentNetworkPreferenceSetting is AnyNetwork){
-                fetchJoke()
-            }else{
-                localMainScreenState.value=Error("Cannot sync your home feed because current's device network connection does not fulfill the app's network requirements.")
-            }
-        }
+     viewModelScope.launch {
+         if (localCurrentConnectedNetwork.value is WiFiConnection
+             && localCurrentNetworkPreferenceSetting.value is WiFiNetwork) {
+             fetchJoke()
+         } else if ((localCurrentConnectedNetwork.value is WiFiConnection
+                     || localCurrentConnectedNetwork.value is CellularConnection)
+             && localCurrentNetworkPreferenceSetting.value is AnyNetwork) {
+             fetchJoke()
+         } else {
+             localMainScreenState.value =
+                 Error("Cannot sync your home feed because current's device network connection does not fulfill the app's network requirements.")
+         }
+     }
     }
 
 ```
