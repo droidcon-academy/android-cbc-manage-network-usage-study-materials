@@ -30,6 +30,7 @@ private val networkRequest = NetworkRequest.Builder()
    private val localCurrentDeviceNetwork = MutableStateFlow<NetworkConnectionType>(NoConnection)
     val currentDeviceNetwork: StateFlow<NetworkConnectionType>
         get() = localCurrentDeviceNetwork
+
     private val networkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
@@ -127,7 +128,7 @@ private val networkRequest = NetworkRequest.Builder()
 
             }
 
-override fun onPause() {
+        override fun onPause() {
             super.onPause()
             preferenceScreen.sharedPreferences
                 ?.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
@@ -154,7 +155,7 @@ override fun onPause() {
         }
 
 // inside the activity's onStart method
-override fun onStart() {
+    override fun onStart() {
         super.onStart()
         val defaultSharedPreference = PreferenceManager.getDefaultSharedPreferences(this)
         val currentUserNetwork=defaultSharedPreference.getString(syncFeedKey, wifiNetwork)
