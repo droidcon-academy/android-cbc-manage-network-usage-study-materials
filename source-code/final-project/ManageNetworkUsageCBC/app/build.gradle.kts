@@ -2,16 +2,17 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jetbrains.kotlin.plugin.compose") version ("2.0.0")
 }
 
 android {
     namespace = "com.droidcon.managenetworkusage"
-    compileSdk = 33
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.droidcon.managenetworkusage"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
